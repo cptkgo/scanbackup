@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Easybooker QR</title>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+            <link href="css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div style="width:100vw; height:100vh; background-image:url('img/bg.jpg'); background-position:center; background-size:cover; text-align:center; display:table-cell; vertical-align:middle;">
+            <img src="img/logo_ebw.png" style="max-width:80vw; margin:0 auto;"><br><br><br>
+                <a target="_blank" href="javascript:scan();" style="padding:10px 30px; background-color:#fff; color:#10947c; border-radius:20px; font-size:2em; box-shadow:1px 2px 3px rgba(0,0,0,0.2); margin:5px;"><button id="scanbutton" style="background:none; border:none;">Scan</button></a>
+                <br><br><br><br>
+                <a target="_blank" href="javascript:deleteAllCookies();" style="padding:5px 10px; background-color:#fff; color:#10947c; border-radius:12px; font-size:16px; box-shadow:1px 2px 3px rgba(0,0,0,0.2);; position:absolute; bottom:20px;text-align:center; margin:0 auto; left:0; right:0; width:100px; "><button id="scanbutton" style="background:none; border:none;">Afmelden</button></a>
+                </div>
+
+
+        
+        
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="cordova.js"></script>
+
+        <!-- destroy cookie -->
+        <script>
+            function deleteAllCookies() {
+                var cookies = document.cookie.split(";");
+
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i];
+                    var eqPos = cookie.indexOf("=");
+                    var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                }
+                window.location.replace('index.html');
+            }
+        </script>
+
+
+        <script>
+            
+            var authk = window.location.hash.substr(1)
+            // alert(authk);
+            if(authk.length == 150){
+                // alert("authkey OK!");
+                document.cookie = 'authkey=' + authk + '; expires=31 Dec 2030 23:59:59 GMT';
+            }
+        
+            if (localStorage.getItem("LocalData") == null) {
+                var data = [];
+                data = JSON.stringify(data);
+                localStorage.setItem("LocalData", data);
+            }
+        
+            function scan() {
+                cordova.plugins.barcodeScanner.scan(
+                    function (result) {
+                        if (!result.cancelled) {
+                            console.log("https://backoffice.easybooker.be/qrscanner.php?id=" + result.text);
+                           // window.location.replace("https://backoffice.easybooker.be/qrscanner.php?id=",result.text);
+                            //window.open('https://qr.easybooker.be/scan.php?auth=' + authk + '&id=' + result.text, '_blank', 'location=yes,toolbar=yes,closebuttoncaption=Sluiten');
+                                                    
+                                var win = window.open( 'https://qr.easybooker.be/scan.php?auth=' + authk + '&id=' + result.text, '_blank', 'location=no,toolbar=no,closebuttoncaption=Sluiten,EnableViewPortScale=yes');
+                                win.addEventListener( "loadstart", function(event) {
+                                     if(event.url == 'https://qr.easybooker.be/close.html'){
+                                        win.close();
+                                     }
+                                     if(event.url == 'https://qr.easybooker.be/close/scanner'){
+                                         win.close();
+                                     }
+                                 });
+                        } else {
+                             //alert("Scan gestopt");
+                        }
+                    },
+                    function (error) {
+                        alert("Scan fout: " + error);
+                    }
+                );
+            }
+        
+        </script>
+    </body>
+</html>

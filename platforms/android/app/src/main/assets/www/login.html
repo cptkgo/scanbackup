@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:">
+
+        <allow-navigation href="*" />
+        <access origin="*"/>
+
+        <title>Easybooker QR Scanner - Login</title>
+
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+
+    </head>
+
+    <body class="gray-bg">
+
+        <div class="col-md-6 col-md-offset-3 text-center loginscreen animated fadeInDown" style="padding-top:10vh !important">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 text-center">
+
+                    <!--<h1 class="logo-name">Easybooker</h1>-->
+
+                    <img src="img/logo_alt.png" class="img-responsive" style="max-width:50%; margin:0 auto; padding-top:10px">
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <h3 style="margin-top:50px; text-transform:uppercase">Welkom bij Easybooker!</h3>
+                    <p>Via deze app beheer je snel en eenvoudig klant QR-codes!</p>
+                    <p style="margin-top:25px">Log je nu in of vraag een account aan</p>
+
+                    <form class="m-t" role="form" id="loginform">
+                        <div class="form-group">
+                            <input type="email" class="form-control" name="username" placeholder="Gebruikersnaam" required="">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" name="password" placeholder="Wachtwoord" required="">
+                        </div>
+                        <button type="submit" class="btn btn-primary block full-width m-b">Aanmelden</button>
+
+                        <a href="javascript:forgotpassword();"><small>Wachtwoord vergeten?</small></a>
+                        <p class="text-muted text-center"><small>Nog geen account?</small></p>
+                        <a class="btn btn-sm btn-white btn-block" href="javascript:newaccount();">Vraag een account aan</a>
+                    </form>
+
+                    <div id="result"></div>
+
+                    <p class="m-t"> <small>Easybooker &copy; 2018</small> </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mainly scripts -->
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="cordova.js"></script>
+
+        <script>
+            /* Attach a submit handler to the form */
+            $("#loginform").submit(function (event) {
+                var ajaxRequest;
+                /* Stop form from submitting normally */
+                event.preventDefault();
+                /* Clear result div*/
+                $("#result").html('');
+                /* Get from elements values */
+                var values = $(this).serialize();
+                /* Send the data using post and put the results in a div */
+                /* I am not aborting previous request because It's an asynchronous request, meaning
+                 Once it's sent it's out there. but in case you want to abort it  you can do it by
+                 abort(). jQuery Ajax methods return an XMLHttpRequest object, so you can just use abort(). */
+                ajaxRequest = $.ajax({
+                    url: "https://napp.easybooker.be/qrlogin.php",
+                    type: "post",
+                    data: values
+                });
+                /*  request cab be abort by ajaxRequest.abort() */
+
+                ajaxRequest.done(function (response, textStatus, jqXHR) {
+                    // show successfully for submit message
+                    var authkey = response;
+                     // alert(authk);
+                     if(authkey.length == 150){
+                        console.log('authkey=' + authkey + '; expires=31 Dec 2030 23:59:59 GMT');
+                        document.cookie = 'authkey=' + authkey + '; expires=31 Dec 2030 23:59:59 GMT';
+                        // alert('index.html?id='+authkey);
+                        window.location.replace('index.html#'+authkey);
+                     }else{
+                                 alert('gebruikersnaam of wachtwoord incorrect');
+                        window.location.replace('login.html');
+                     }
+                });
+                /* On failure of request this function will be called  */
+                ajaxRequest.fail(function () {
+                	alert(response);
+                    // show error
+                    $("#result").html('Er ging iets mis, gelieve ons te contacteren als dit probleem zich blijft voordoen.');
+                });
+            });
+        </script>
+
+        <script>
+            // check if cookie is set
+            function getCookie(name) {
+                var dc = document.cookie;
+                var prefix = name + "=";
+                var begin = dc.indexOf("; " + prefix);
+                if (begin == -1) {
+                    begin = dc.indexOf(prefix);
+                    if (begin != 0)
+                        return null;
+                } else
+                {
+                    begin += 2;
+                    var end = document.cookie.indexOf(";", begin);
+                    if (end == -1) {
+                        end = dc.length;
+                    }
+                }
+                // because unescape has been deprecated, replaced with decodeURI
+                //return unescape(dc.substring(begin + prefix.length, end));
+                return decodeURI(dc.substring(begin + prefix.length, end));
+            }
+
+            function doSomething() {
+                var myCookie = getCookie("authkey");
+
+                if (myCookie == null) {
+                    // action when cookie is not set
+                } else {
+                    window.location.replace("scanner.html");
+                }
+            }
+
+            doSomething();
+
+        </script>
+
+        <script>
+                function forgotpassword() {
+                    window.open('https://backoffice.easybooker.be/forgotpassword.php', '_blank', 'location=no,toolbar=yes,closebuttoncaption=Sluiten');
+                }
+                function newaccount() {
+                    window.open('https://easybooker.be/contact.php', '_blank', 'location=no,toolbar=yes,closebuttoncaption=Sluiten');
+                }
+        </script>
+    </body>
+
+</html>

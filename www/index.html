@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+
+        <allow-navigation href="http://*/*"/>
+        <allow-navigation href="https://*/*"/>
+        <access origin="*"/>
+
+        <title>Easybooker QR Scanner</title>
+    </head>
+        <!-- Mainly scripts -->
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="cordova.js"></script>
+
+
+<!-- no session redirect to scanner -->
+    <script>
+        // no session redirect to scanner
+    </script>
+    
+<!-- set cookie -->
+    <script>
+        var authk = window.location.hash.substr(1)
+        // alert(authk);
+        if(authk.length == 150){
+            //alert("authkey OK!");
+            document.cookie = 'authkey=' + authk + '; expires=31 Dec 2030 23:59:59 GMT';
+        }
+    </script>
+    
+<!-- cookie checker -->
+    <script>
+        // check if cookie is set
+        function getCookie(name) {
+            var dc = document.cookie;
+            var prefix = name + "=";
+            var begin = dc.indexOf("; " + prefix);
+            if (begin == -1) {
+                begin = dc.indexOf(prefix);
+                if (begin != 0) return null;
+            }
+            else
+            {
+                begin += 2;
+                var end = document.cookie.indexOf(";", begin);
+                if (end == -1) {
+                    end = dc.length;
+                }
+            }
+            // because unescape has been deprecated, replaced with decodeURI
+            //return unescape(dc.substring(begin + prefix.length, end));
+            return decodeURI(dc.substring(begin + prefix.length, end));
+        }
+    
+        function checkCookie() {
+            var myCookie = getCookie("authkey");
+            
+            if (myCookie == null) {
+                // alert('Cookie not set!');
+                window.location.replace("login.html");
+            }
+            else {
+                // alert('Cookie set!');
+                window.location.replace("scanner.html#"+myCookie);
+            }
+        }
+    
+        checkCookie();
+
+    </script>
+    
+<!-- open page in inappbrowser example-->
+    <script>
+        //    function createAccount() {
+        //        window.open('http://apache.org', '_blank', 'location=no,toolbar=yes,closebuttoncaption=Sluiten');
+        //    }
+    </script>
+    
+    </body>
+</html>
